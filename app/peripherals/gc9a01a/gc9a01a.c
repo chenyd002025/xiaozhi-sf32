@@ -136,11 +136,10 @@ static void LCD_Init(LCDC_HandleTypeDef *hlcdc)
     memcpy(&hlcdc->Init, &lcdc_int_cfg, sizeof(LCDC_InitTypeDef));
     HAL_LCDC_Init(hlcdc);
 
-    BSP_LCD_Reset(1);//Reset LCD
+    BSP_LCD_Reset(0);//Reset LCD (拉低复位)
     LCD_DRIVER_DELAY_MS(20);
-    BSP_LCD_Reset(0);
-    LCD_DRIVER_DELAY_MS(10);
-    BSP_LCD_Reset(1);
+    BSP_LCD_Reset(1);//释放复位 (拉高)
+    LCD_DRIVER_DELAY_MS(120);//等待复位完成
 
     //GC9A01_HSD1.28_SPI4W_240x240
     LCD_DRIVER_DELAY_MS(100);
@@ -580,9 +579,9 @@ static void LCD_Init(LCDC_HandleTypeDef *hlcdc)
 //    parameter[0] = 0x00;
 //    LCD_WriteReg(hlcdc, REG_TEARING_EFFECT, parameter, 1);
 
-//    /* Display ON command */
-//    LCD_WriteReg(hlcdc, REG_DISPLAY_ON, (uint8_t *)NULL, 0);
-//  rt_kprintf("GC9A01A_Init end!!\n");
+    /* Display ON command */
+    LCD_WriteReg(hlcdc, REG_DISPLAY_ON, (uint8_t *)NULL, 0);
+  rt_kprintf("GC9A01A_Init end!!\n");
 
 }
 
@@ -823,4 +822,3 @@ static const LCD_DrvOpsDef GC9A01A_drv =
 
 LCD_DRIVER_EXPORT2(GC9A01A, 0x8181b3, &lcdc_int_cfg,
                    &GC9A01A_drv, 1);
-
