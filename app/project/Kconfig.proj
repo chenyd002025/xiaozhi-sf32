@@ -24,13 +24,22 @@ if !BSP_USING_BUILTIN_LCD
         bool
         default n
 
+    config LCD_USING_GC9A01
+        bool
+        default n
+
     choice
         prompt "Built-in LCD module driver"
-        default LCD_USING_SPI_ST7789
+        default LCD_USING_SPI_GC9A01
 
         config LCD_USING_SPI_ST7789
             bool "1.69 rect SPI LCD(240x280)"
             select LCD_USING_ST7789
+            select BSP_LCDC_USING_SPI_DCX_1DATA
+
+        config LCD_USING_SPI_GC9A01
+            bool "1.28 circle SPI LCD(240x240)"
+            select LCD_USING_GC9A01
             select BSP_LCDC_USING_SPI_DCX_1DATA
 
     endchoice
@@ -38,16 +47,19 @@ if !BSP_USING_BUILTIN_LCD
     config LCD_HOR_RES_MAX
         int
         default 280 if LCD_USING_SPI_ST7789
+        default 240 if LCD_USING_SPI_GC9A01
 
 
     config LCD_VER_RES_MAX
         int
         default 240 if LCD_USING_SPI_ST7789
+        default 240 if LCD_USING_SPI_GC9A01
 
 
     config LCD_DPI
         int
         default 320 if LCD_USING_SPI_ST7789
+        default 320 if LCD_USING_SPI_GC9A01
 
 
 
@@ -79,4 +91,4 @@ config KWS_ENABLE_DEFAULT
     bool "Enable KWS by default"
     default n
     help
-        Enable KWS (Keyword Spotting) by default in the application. 
+        Enable KWS (Keyword Spotting) by default in the application.
