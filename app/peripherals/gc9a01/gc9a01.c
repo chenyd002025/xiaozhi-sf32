@@ -240,12 +240,10 @@ static void LCD_Init(LCDC_HandleTypeDef *hlcdc)
  */
 static uint32_t LCD_ReadID(LCDC_HandleTypeDef *hlcdc)
 {
-    uint32_t data = 0;
-
-    data = LCD_ReadData(hlcdc, REG_LCD_ID, 3);
-    rt_kprintf("DBG:%s %d ID:%0x", __FUNCTION__, __LINE__, data);
-    data = 0x8181b3; // 不同厂商的ID可能不一样，因此这里使用固定的ID
-    return data;
+    // GC9A01 doesn't have a standard ID register like ST7789
+    // Return fixed ID for compatibility
+    rt_kprintf("DBG:%s %d ID:%0x", __FUNCTION__, __LINE__, THE_LCD_ID);
+    return THE_LCD_ID;
 }
 
 /**
@@ -385,7 +383,7 @@ static uint32_t LCD_ReadPixel(LCDC_HandleTypeDef *hlcdc, uint16_t Xpos,
     uint32_t ret_v;
 
     parameter[0] = 0x66;
-    LCD_WriteReg(hlcdc, REG_COLOR_MODE, parameter, 1);
+    LCD_WriteReg(hlcdc, REG_COLMOD, parameter, 1);
 
     LCD_SetRegion(hlcdc, Xpos, Ypos, Xpos, Ypos);
 
@@ -436,9 +434,9 @@ static uint32_t LCD_ReadPixel(LCDC_HandleTypeDef *hlcdc, uint16_t Xpos,
         break;
     }
 
-    rt_kprintf("ST7789_ReadPixel %x -> %x\n", c, ret_v);
+    rt_kprintf("GC9A01_ReadPixel %x -> %x\n", c, ret_v);
 
-    LCD_WriteReg(hlcdc, REG_COLOR_MODE, parameter, 1);
+    LCD_WriteReg(hlcdc, REG_COLMOD, parameter, 1);
 
     return ret_v;
 }
@@ -482,16 +480,18 @@ static void LCD_SetColorMode(LCDC_HandleTypeDef *hlcdc, uint16_t color_mode)
         break;
     }
 
-    LCD_WriteReg(hlcdc, REG_COLOR_MODE, parameter, 1);
+    LCD_WriteReg(hlcdc, REG_COLMOD, parameter, 1);
     HAL_LCDC_SetOutFormat(hlcdc, lcdc_int_cfg.color_mode);
 }
 
-#define ST7789_BRIGHTNESS_MAX 127
-
+// GC9A01 doesn't have a dedicated brightness control register like ST7789
+// Brightness control is typically done through PWM backlight control
 static void LCD_SetBrightness(LCDC_HandleTypeDef *hlcdc, uint8_t br)
 {
-    uint8_t bright = (uint8_t)((int)ST7789_BRIGHTNESS_MAX * br / 100);
-    LCD_WriteReg(hlcdc, REG_WBRIGHT, &bright, 1);
+    // GC9A01 doesn't support software brightness control via registers
+    // This function is kept for compatibility but does nothing
+    // Actual brightness control should be handled through PWM backlight
+    rt_kprintf("GC9A01 brightness control requires PWM backlight hardware\n");
 }
 
 static const LCD_DrvOpsDef GC9A01_drv = {LCD_Init,
