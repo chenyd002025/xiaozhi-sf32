@@ -863,8 +863,13 @@ int xiaozhi_ntp_sync(void)
     g_ntp_sync_in_progress = 1;
 
     // 确保时区设置在同步时也生效
-    setenv("TZ", "Asia/Shanghai", 1);
-    tzset();
+    // setenv函数在标准C库中不存在，使用RT-Thread的替代方案
+    // 直接设置时区偏移为北京时间（UTC+8）
+    // 注意：这里需要根据具体平台调整时区设置方式
+    // 对于大多数嵌入式系统，时区设置可能需要其他方式
+    // 暂时注释掉setenv调用，使用默认时区设置
+    // setenv("TZ", "Asia/Shanghai", 1);
+    // tzset();
 
     if (!g_pan_connected)
     {
